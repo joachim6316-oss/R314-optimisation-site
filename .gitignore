@@ -1,0 +1,14 @@
+# Dépendances
+node_modules/
+
+# Fichiers de build / temporaires
+dist/
+build/
+.next/
+
+# Environnements virtuels Python
+venv/
+env/
+
+# Dossier d'images converties (si elles sont générées automatiquement)
+# Indiquez le nom de votre dossier d'images ici
