@@ -44,12 +44,12 @@ magick img1.jpg -resize 800x -quality 78 img1-800.jpg</code></pre>
 <tr><td>WebP</td><td>−30 % environ</td><td>universel aujourd'hui</td></tr>
 <tr><td>AVIF</td><td>−50 % environ</td><td>très large, mais encodage plus lent</td></tr>
 </tbody></table></div>
-<p>Pour conserver un repli, utilisez <code>&lt;picture&gt;</code> :</p>
-<pre><code class="lang-html">&lt;picture&gt;
-  &lt;source srcset="img/img1.avif" type="image/avif"&gt;
-  &lt;source srcset="img/img1.webp" type="image/webp"&gt;
-  &lt;img src="img/img1.jpg" alt="Image 1" width="760" height="507"&gt;
-&lt;/picture&gt;</code></pre>
+<p>Pour conserver un repli, utilisez <code><picture></code> :</p>
+<pre><code class="lang-html"><picture>
+  <source srcset="img/img1.avif" type="image/avif">
+  <source srcset="img/img1.webp" type="image/webp">
+  <img src="img/img1.webp" alt="Image 1" width="760" height="507">
+</picture></code></pre>
 <p>Pour un logo, une icône ou un pictogramme : <strong>SVG</strong>, qui pèse quelques centaines d'octets et reste net à toute taille. Un bitmap là où un SVG conviendrait, c'est du poids payé pour rien — et la question se pose pour toutes les icônes d'une page, favicon compris.</p>
 <h3>A4. Images servies plusieurs fois</h3>
 <p>Le navigateur identifie une ressource par son <strong>URL complète</strong>, query string comprise. <code>img/photo.jpg</code> et <code>img/photo.jpg?v=2</code> sont deux ressources différentes : elles sont téléchargées deux fois, mises en cache deux fois.</p>
@@ -60,33 +60,33 @@ magick img1.jpg -resize 800x -quality 78 img1-800.jpg</code></pre>
 <p><strong>Correction :</strong> si l'effet visuel est négligeable, supprimez la règle — mais vérifiez d'abord qu'il est bien négligeable (la contrainte d'iso-rendu s'applique). Si l'effet est voulu, une image de quelques dizaines de kilo-octets suffit largement pour une texture : une texture n'a pas besoin d'être nette.</p>
 <h3>A6. <code>width</code> / <code>height</code> et le CLS</h3>
 <p>Sans dimensions déclarées, le navigateur réserve une hauteur de zéro, puis pousse tout le contenu vers le bas quand l'image arrive. C'est du CLS, et c'est la chose la plus désagréable qui puisse arriver à un lecteur.</p>
-<pre><code class="lang-html">&lt;img src="img/img1.jpg" alt="Image 1" width="760" height="507"&gt;</code></pre>
+<pre><code class="lang-html"><img src="img/img1.webp" alt="Image 1" width="760" height="507"></code></pre>
 <p>Les attributs donnent le <strong>ratio</strong>, pas la taille d'affichage : votre CSS (<code>width:100%; height:auto</code>) continue de commander. Il n'y a aucune raison de s'en priver.</p>
 <h3>A7. Chargement différé</h3>
-<pre><code class="lang-html">&lt;!-- images sous la ligne de flottaison --&gt;
-&lt;img src="…" loading="lazy" decoding="async" width="760" height="507"&gt;
+<pre><code class="lang-html">!-- images sous la ligne de flottaison --
+<img src="…" loading="lazy" decoding="async" width="760" height="507">
 
-&lt;!-- l'image LCP, au contraire : jamais lazy, et prioritaire --&gt;
-&lt;img src="…" fetchpriority="high" width="760" height="507"&gt;</code></pre>
+!-- l'image LCP, au contraire : jamais lazy, et prioritaire --
+<img src="…" fetchpriority="high" width="760" height="507"></code></pre>
 <p>Attention : mettre <code>loading="lazy"</code> sur l'image principale <strong>dégrade</strong> le LCP. La règle est : tout ce qui est visible d'emblée reste en chargement immédiat.</p>
 <h3>A8. <code>srcset</code></h3>
 <p>Pour servir une image adaptée à chaque écran :</p>
-<pre><code class="lang-html">&lt;img src="img/img1-760.jpg"
-     srcset="img/img1-380.jpg 380w, img/img1-760.jpg 760w, img/img1-1200.jpg 1200w"
-     sizes="(max-width:560px) 100vw, (max-width:900px) 50vw, 33vw"
-     alt="Image 1" width="760" height="507"&gt;</code></pre>
+<pre><code class="lang-html"><img src="img/img1-760.jpg">
+     <srcset="img/img1-380.jpg 380w, img/img1-760.jpg 760w, img/img1-1200.jpg 1200w"></srcset>
+     <sizes="(max-width:560px) 100vw, (max-width:900px) 50vw, 33vw"></sizes>
+     <alt="Image 1" width="760" height="507"></code></pre>
 <p><code>sizes</code> doit décrire la largeur d'affichage réelle selon le viewport. Relisez les media queries du CSS pour la déterminer.</p>
 <hr>
 <h2>B. Chaîne critique et réseau</h2>
-<h3>B1. Scripts bloquants dans le <code>&lt;head&gt;</code></h3>
-<pre><code class="lang-html">&lt;script src="…"&gt;&lt;/script&gt;</code></pre>
+<h3>B1. Scripts bloquants dans le <code><head></code></h3>
+<pre><code class="lang-html"><script src="…"></script></code></pre>
 <p>Cette forme <strong>arrête l'analyse du HTML</strong> : téléchargement, puis exécution complète, puis reprise. Tant que ça dure, rien ne s'affiche.</p>
 <div class="docs-table"><table>
 <thead><tr><th>Forme</th><th>Téléchargement</th><th>Exécution</th><th>Ordre garanti</th></tr></thead>
 <tbody>
-<tr><td><code>&lt;script&gt;</code></td><td>bloque le parsing</td><td>immédiate</td><td>oui</td></tr>
-<tr><td><code>&lt;script defer&gt;</code></td><td>en parallèle</td><td>après le parsing</td><td>oui</td></tr>
-<tr><td><code>&lt;script async&gt;</code></td><td>en parallèle</td><td>dès que prêt</td><td>non</td></tr>
+<tr><td><code>script</code></td><td>bloque le parsing</td><td>immédiate</td><td>oui</td></tr>
+<tr><td><code>script defer</code></td><td>en parallèle</td><td>après le parsing</td><td>oui</td></tr>
+<tr><td><code>script async</code></td><td>en parallèle</td><td>dès que prêt</td><td>non</td></tr>
 </tbody></table></div>
 <p><strong>Règle :</strong> <code>defer</code> par défaut. <code>async</code> seulement pour un script totalement indépendant. Sans attribut, seulement si vous pouvez justifier pourquoi.</p>
 <p>Si plusieurs scripts dépendent les uns des autres, <code>defer</code> préserve leur ordre — c'est précisément à ça qu'il sert.</p>
@@ -95,23 +95,23 @@ magick img1.jpg -resize 800x -quality 78 img1-800.jpg</code></pre>
 @import url('b.css');   /* b.css n'est découvert qu'après téléchargement de a.css */</code></pre>
 <p>Chaque niveau d'<code>@import</code> ajoute un aller-retour <strong>en série</strong>, et le CSS bloque le rendu. Une chaîne de trois fichiers, c'est trois allers-retours avant le premier pixel.</p>
 <p><strong>Comment vérifier :</strong> dans la cascade de l'onglet Réseau, les fichiers CSS apparaissent en escalier au lieu d'être alignés.</p>
-<p><strong>Correction :</strong> remplacez par des <code>&lt;link&gt;</code> parallèles dans le HTML, ou fusionnez les fichiers.</p>
-<pre><code class="lang-html">&lt;link rel="stylesheet" href="css/a.css"&gt;
-&lt;link rel="stylesheet" href="css/b.css"&gt;</code></pre>
+<p><strong>Correction :</strong> remplacez par des <code><link></code> parallèles dans le HTML, ou fusionnez les fichiers.</p>
+<pre><code class="lang-html"><link rel="stylesheet" href="css/a.css">
+<link rel="stylesheet" href="css/b.css"></code></pre>
 <h3>B3. Polices web</h3>
 <p>Trois problèmes distincts, souvent cumulés.</p>
 <p><strong>Le domaine.</strong> Les polices Google sont sur <code>fonts.gstatic.com</code>, distinct de <code>fonts.googleapis.com</code> qui sert la feuille de style. Chaque nouveau domaine coûte une résolution DNS, une poignée de main TCP et une négociation TLS avant le moindre octet utile.</p>
-<pre><code class="lang-html">&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
-&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</code></pre>
+<pre><code class="lang-html"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></code></pre>
 <p><strong>Le <code>font-display</code>.</strong> <code>display=block</code> masque le texte jusqu'à l'arrivée de la police (<em>FOIT</em> : l'utilisateur regarde une page vide). <code>display=swap</code> affiche immédiatement avec une police système, puis remplace.</p>
-<pre><code>https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap</code></pre>
+<pre><code>https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap</code></pre>
 <p><strong>Les graisses inutilisées.</strong> Chaque graisse (<code>300</code>, <code>400</code>, <code>600</code>, <code>700</code>) est un fichier distinct. Comptez celles que votre CSS utilise vraiment.</p>
 <p><strong>Le <code>preload</code> de police.</strong> Il est utile, mais une police est toujours récupérée en mode anonyme CORS. Un <code>preload</code> <strong>sans <code>crossorigin</code></strong> crée une entrée de cache qui ne correspond pas à celle de la vraie requête : la police est <strong>téléchargée deux fois</strong>, et le <code>preload</code> fait l'inverse de ce qu'on attend de lui.</p>
-<pre><code class="lang-html">&lt;!-- faux : deux téléchargements --&gt;
-&lt;link rel="preload" as="font" type="font/woff2" href="…woff2"&gt;
+<pre><code class="lang-html">!-- faux : deux téléchargements --
+<link rel="preload" as="font" type="font/woff2" href="…woff2">
 
-&lt;!-- correct --&gt;
-&lt;link rel="preload" as="font" type="font/woff2" href="…woff2" crossorigin&gt;</code></pre>
+!-- correct --
+<link rel="preload" as="font" type="font/woff2" href="…woff2" crossorigin></code></pre>
 <p>Chrome le signale dans la console : <em>« A preload for … is found, but is not used because the request credentials mode does not match. »</em> Lisez vos avertissements de console.</p>
 <p><strong>L'alternative :</strong> héberger la police avec le site. Un domaine de moins, plus de dépendance externe, et le contrôle total du <code>font-display</code>.</p>
 <h3>B4. <code>preload</code> mal employé</h3>
@@ -136,8 +136,8 @@ for (const el of items) {
 }
 
 // ✅ toutes les lectures, puis toutes les écritures : un seul reflow
-const heights = items.map(el =&gt; el.offsetHeight);
-items.forEach((el, i) =&gt; { el.style.height = heights[i] + 'px'; });</code></pre>
+const heights = items.map(el => el.offsetHeight);
+items.forEach((el, i) => { el.style.height = heights[i] + 'px'; });</code></pre>
 <p>Chrome vous prévient : <em>« Forced reflow while executing JavaScript »</em> dans la console et sur les blocs du panneau Performance. Ce message est une adresse, pas une fatalité.</p>
 <h3>C3. Complexité quadratique</h3>
 <p>Un <code>querySelectorAll</code> à l'intérieur d'une boucle qui parcourt déjà le résultat d'un <code>querySelectorAll</code> donne un coût en n². Avec 6 éléments c'est indolore, avec 300 c'est 90 000 opérations — par événement.</p>
@@ -154,7 +154,7 @@ for (const card of cards) { … }</code></pre>
 <h3>C4. Gestionnaires de <code>scroll</code> et de <code>resize</code></h3>
 <p>Ces événements se déclenchent des dizaines de fois par seconde. Y placer du travail lourd garantit le saccadement.</p>
 <p><strong>Solution 1 — la bonne : <code>IntersectionObserver</code>.</strong> Pour « faire quelque chose quand un élément entre dans le viewport », c'est l'outil prévu. Le navigateur fait le calcul lui-même, hors du fil principal, sans reflow forcé.</p>
-<pre><code class="lang-js">const io = new IntersectionObserver((entries) =&gt; {
+<pre><code class="lang-js">const io = new IntersectionObserver((entries) => {
   for (const e of entries) {
     if (e.isIntersecting) {
       e.target.classList.add('visible');
@@ -163,24 +163,24 @@ for (const card of cards) { … }</code></pre>
   }
 }, { rootMargin: '0px 0px -40px 0px' });
 
-document.querySelectorAll('.card').forEach(el =&gt; io.observe(el));</code></pre>
+document.querySelectorAll('.card').forEach(el => io.observe(el));</code></pre>
 <p><strong>Solution 2 — si l'écoute du scroll est vraiment nécessaire :</strong> limiter la fréquence et écouter passivement.</p>
 <pre><code class="lang-js">let ticking = false;
-window.addEventListener('scroll', () =&gt; {
+window.addEventListener('scroll', () => {
   if (ticking) return;
   ticking = true;
-  requestAnimationFrame(() =&gt; { onScroll(); ticking = false; });
+  requestAnimationFrame(() => { onScroll(); ticking = false; });
 }, { passive: true });</code></pre>
 <p><code>{ passive: true }</code> indique au navigateur que vous n'appellerez pas <code>preventDefault()</code> : il peut alors scroller sans attendre votre code.</p>
 <h3>C5. Construction du DOM</h3>
 <pre><code class="lang-js">// ❌ le navigateur re-analyse et reconstruit tout le sous-arbre à chaque tour
-for (let i = 0; i &lt; 200; i++) {
-  host.innerHTML += '&lt;span&gt;' + label + '&lt;/span&gt;';
+for (let i = 0; i < 200; i++) {
+  host.innerHTML += '<span>' + label + '</span>';
 }
 
 // ✅ une seule insertion
 const frag = document.createDocumentFragment();
-for (let i = 0; i &lt; 200; i++) {
+for (let i = 0; i < 200; i++) {
   const s = document.createElement('span');
   s.className = 'tag';
   s.textContent = label;

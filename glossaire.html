@@ -26,11 +26,10 @@
 <h3>Causes principales</h3>
 <ul><li>Images ou vidéos sans dimensions</li><li>Publicités ou bannières dynamiques</li><li>Polices de caractères (Web Fonts)</li></ul>
 <h3>La solution la plus simple (Code)</h3>
-<pre><code class="lang-html">&lt;!-- Mauvaise pratique : le navigateur ne connaît pas la taille, la page va sauter --&gt;
-&lt;img src="mon-image.jpg" alt="Paysage"&gt;
+<pre><code class="lang-html">!-- Mauvaise pratique : le navigateur ne connaît pas la taille, la page va sauter --
+<img src="mon-image.jpg" alt="Paysage">
 
-&lt;!-- Bonne pratique : l'espace de 800x600 est réservé immédiatement --&gt;
-&lt;img src="mon-image.jpg" width="800" height="600" alt="Paysage"&gt;</code></pre>
+<img src="mon-image.jpg" width="800" height="600" alt="Paysage"></code></pre>
 <h3>Évaluation et seuils de Google</h3>
 <ul><li><strong>Bon :</strong> Inférieur à 0.1</li><li><strong>À améliorer :</strong> Entre 0.1 et 0.25</li><li><strong>Médiocre :</strong> Supérieur à 0.25</li></ul>
 <hr>
@@ -39,13 +38,13 @@
 <h3>Causes principales</h3>
 <ul><li>Images non optimisées</li><li>Temps de réponse du serveur lent</li><li>Blocage du rendu (JavaScript ou CSS bloquant)</li></ul>
 <h3>La solution la plus simple (Code)</h3>
-<pre><code class="lang-html">&lt;head&gt;
-  &lt;!-- On ordonne au navigateur de télécharger cette image avant le reste --&gt;
-  &lt;link rel="preload" href="grande-banniere.webp" as="image"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;img src="grande-banniere.webp" alt="Bannière principale"&gt;
-&lt;/body&gt;</code></pre>
+<pre><code class="lang-html"><head>
+  !-- On ordonne au navigateur de télécharger cette image avant le reste --
+  <link rel="preload" href="grande-banniere.webp" as="image">
+</head>
+<body>
+  <img src="grande-banniere.webp" alt="Bannière principale">
+</body></code></pre>
 <blockquote><p>⚠️ <strong>Le <code>preload</code> n'est pas une recette universelle.</strong> Il ne rend rien plus rapide : il <em>change des priorités</em>. Précharger une image qui n'est pas nécessaire au premier affichage lui fait voler de la bande passante à celle qui détermine justement le LCP — et dégrade donc le LCP au lieu de l'améliorer. On ne précharge que ce qui est à la fois critique et découvert tardivement par le navigateur. Voir le point B4 du <a href="guide.html">guide de résolution</a>.</p></blockquote>
 <h3>Évaluation et seuils de Google</h3>
 <ul><li><strong>Bon :</strong> Moins de 2,5 secondes</li><li><strong>À améliorer :</strong> Entre 2,5 s et 4,0 s</li><li><strong>Médiocre :</strong> Plus de 4,0 secondes</li></ul>
@@ -73,16 +72,16 @@ function fairePleinDeChosesAmeliore() {
 <h3>Causes principales</h3>
 <ul><li>Fichiers CSS ou JavaScript lourds bloquant l'affichage initial</li><li>Ressources non critiques chargées trop tôt</li></ul>
 <h3>La solution la plus simple (Code)</h3>
-<pre><code class="lang-html">&lt;head&gt;
-  &lt;!-- CSS critique inline --&gt;
-  &lt;style&gt;
+<pre><code class="lang-html"><head>
+  !-- CSS critique inline --
+  <style>
     body { font-family: sans-serif; background: #f4f4f4; }
     h1 { color: #333; margin-top: 20px; }
-  &lt;/style&gt;
+  </style>
 
-  &lt;!-- Le CSS moins urgent chargé de façon asynchrone --&gt;
-  &lt;link rel="preload" href="reste-du-site.css" as="style" onload="this.onload=null;this.rel='stylesheet'"&gt;
-&lt;/head&gt;</code></pre>
+  !-- Le CSS moins urgent chargé de façon asynchrone --
+  <link rel="preload" href="reste-du-site.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+</head></code></pre>
 <h3>Évaluation et seuils de Google</h3>
 <ul><li><strong>Bon :</strong> Moins de 1,8 seconde</li><li><strong>À améliorer :</strong> Entre 1,8 s et 3,0 s</li><li><strong>Médiocre :</strong> Plus de 3,0 secondes</li></ul>
 <hr>
